@@ -1,0 +1,28 @@
+#define FASTLED_ESP8266_RAW_PIN_ORDER
+#define FASTLED_INTERNAL
+#define FASTLED_INTERRUPT_RETRY_COUNT 0
+#define FASTLED_ALLOW_INTERRUPTS 0
+#include <FastLED.h>
+#define DATA_PIN 15
+#define NUM_LEDS 900
+#define CALIBRATION_TEMPERATURE TypicalLEDStrip  // Color correction
+
+
+CRGB leds[NUM_LEDS];
+
+// Initialize global variables for sequences
+
+void setup() {
+  Serial.begin(115200);
+  FastLED.addLeds<NEOPIXEL, 15>(leds, NUM_LEDS);
+ blendme();
+ FastLED.show();
+}
+void loop () {
+} // loop()
+
+
+void blendme() {
+//  fill_solid(leds, NUM_LEDS,  CRGB(0,244,244));  
+    fill_gradient_RGB(leds, 0, CRGB(244,244,0), CRGB(0,244,244));    // If we don't have this, the colour fill will flip around
+} // blendme()

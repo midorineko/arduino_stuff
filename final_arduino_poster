@@ -1,0 +1,668 @@
+#include "FastLED.h"
+#define NUM_LEDS 50
+CRGB leds[NUM_LEDS];
+void setup() { FastLED.addLeds<NEOPIXEL, 6>(leds, NUM_LEDS); }
+void loop() {
+  leds[0].setRGB( 155, 50, 50);FastLED.show();
+  leds[1].setRGB( 155, 50, 50);FastLED.show();
+  leds[2].setRGB( 155, 50, 50);FastLED.show();
+  leds[3].setRGB( 155, 50, 50);FastLED.show();
+  leds[4].setRGB( 155, 50, 50);FastLED.show();
+  leds[5].setRGB( 155, 50, 50);FastLED.show();
+  leds[6].setRGB( 155, 50, 50);FastLED.show();
+  leds[7].setRGB( 155, 50, 50);FastLED.show();
+  leds[8].setRGB( 155, 50, 50);FastLED.show();
+  leds[9].setRGB( 155, 50, 50);FastLED.show();
+  leds[10].setRGB( 155, 50, 50);FastLED.show();
+  leds[11].setRGB( 155, 50, 50);FastLED.show();
+  leds[17].setRGB( 155, 50, 50);FastLED.show();
+  leds[18].setRGB( 155, 50, 50);FastLED.show();
+  leds[19].setRGB( 155, 50, 50);FastLED.show();
+  leds[20].setRGB( 155, 50, 50);FastLED.show();
+  leds[26].setRGB( 155, 50, 50);FastLED.show();
+  leds[27].setRGB( 155, 50, 50);FastLED.show();
+  leds[28].setRGB( 155, 50, 50);FastLED.show();
+  leds[29].setRGB( 155, 50, 50);FastLED.show();
+  leds[30].setRGB( 155, 50, 50);FastLED.show();
+  leds[31].setRGB( 155, 50, 50);FastLED.show();
+  leds[36].setRGB( 155, 50, 50);FastLED.show();
+  leds[37].setRGB( 155, 50, 50);FastLED.show();
+  leds[38].setRGB( 155, 50, 50);FastLED.show();
+  leds[46].setRGB( 155, 50, 50);FastLED.show();
+  leds[47].setRGB( 155, 50, 50);FastLED.show();
+  leds[48].setRGB( 155, 50, 50);FastLED.show();
+  leds[49].setRGB( 155, 50, 50);FastLED.show();
+
+  leds[12].setRGB(255,255,0);FastLED.show();
+  leds[13].setRGB(255,255,0);FastLED.show();
+  leds[14].setRGB(255,255,0);FastLED.show();
+  leds[15].setRGB(255,255,0);FastLED.show();
+  leds[16].setRGB(255,255,0);FastLED.show();
+  leds[21].setRGB(255,255,0);FastLED.show();
+  leds[22].setRGB(255,255,0);FastLED.show();
+  leds[23].setRGB(255,255,0);FastLED.show();
+  leds[24].setRGB(255,255,0);FastLED.show();
+  leds[25].setRGB(255,255,0);FastLED.show();
+ 
+  leds[32].setRGB(255,182,193);FastLED.show();
+  leds[33].setRGB(255,182,193);FastLED.show();
+  leds[34].setRGB(255,182,193);FastLED.show();
+  leds[35].setRGB(255,182,193);FastLED.show();
+  leds[45].setRGB(255,182,193);FastLED.show();
+  leds[41].setRGB(255,182,193);FastLED.show();
+  leds[42].setRGB(255,182,193);FastLED.show();
+
+  leds[39].setRGB(0,255,0);FastLED.show();
+  leds[40].setRGB(0,255,0);FastLED.show();
+  leds[43].setRGB(0,255,0);FastLED.show();
+  leds[44].setRGB(0,255,0);FastLED.show();
+
+  delay( 6000000 );
+}
+#include<FastLED.h>
+#define NUM_LEDS 50
+
+CRGBArray<NUM_LEDS> leds;
+
+int count = 0;
+static uint8_t hue;
+static uint8_t mew;
+
+void setup() { 
+  FastLED.addLeds<NEOPIXEL,6>(leds, NUM_LEDS);
+  hue = random(0, 50);
+  //set up better hue selector!
+}
+
+void loop(){ 
+    // fade everything out
+    // let's set an led value
+    for(int k = 250; k >= 0; k=k-25) { 
+      for(int i = 0; i < 50; i++) { 
+        FastLED.setBrightness( k );
+      }
+      FastLED.delay(30);
+    }
+    mew = hue;
+    leds[0]= CHSV(mew,255,255);
+    leds[1]= CHSV(mew,255,255);
+    leds[2]= CHSV(mew,255,255);
+    leds[3]= CHSV(mew,255,255);
+    leds[4]= CHSV(mew,255,255);
+    leds[5]= CHSV(mew,255,255);
+    leds[6]= CHSV(mew,255,255);
+    leds[7]= CHSV(mew,255,255);
+    leds[8]= CHSV(mew,255,255);
+    leds[9]= CHSV(mew,255,255);
+    leds[10]= CHSV(mew,255,255);
+    leds[11]= CHSV(mew,255,255);
+    leds[17]= CHSV(mew,255,255);
+    leds[18]= CHSV(mew,255,255);
+    leds[19]= CHSV(mew,255,255);
+    leds[20]= CHSV(mew,255,255);
+    leds[26]= CHSV(mew,255,255);
+    leds[27]= CHSV(mew,255,255);
+    leds[28]= CHSV(mew,255,255);
+    leds[29]= CHSV(mew,255,255);
+
+    leds[12]= CHSV((mew+50),255,255);
+    leds[13]= CHSV((mew+50),255,255);
+    leds[14]= CHSV((mew+50),255,255);
+    leds[15]= CHSV((mew+50),255,255);
+    leds[16]= CHSV((mew+50),255,255);
+    leds[21]= CHSV((mew+50),255,255);
+    leds[22]= CHSV((mew+50),255,255);
+    leds[23]= CHSV((mew+50),255,255);
+    leds[24]= CHSV((mew+50),255,255);
+    leds[25]= CHSV((mew+50),255,255);
+  
+    leds[30]= CHSV(mew+80,255,255);
+    leds[31]= CHSV(mew+80,255,255);
+    leds[32]= CHSV(mew+80,255,255);
+    leds[33]= CHSV(mew+80,255,255);
+    leds[34]= CHSV(mew+80,255,255);
+    leds[35]= CHSV(mew+80,255,255);
+    leds[45]= CHSV(mew+80,255,255);
+    leds[41]= CHSV(mew+80,255,255);
+    leds[42]= CHSV(mew+80,255,255);
+
+    leds[36]= CHSV(mew+80,255,255);
+    leds[37]= CHSV(mew+80,255,255);
+    leds[38]= CHSV(mew+80,255,255);
+    leds[39]= CHSV(mew+80,255,255);
+    leds[40]= CHSV(mew+80,255,255);
+    leds[43]= CHSV(mew+80,255,255);
+    leds[44]= CHSV(mew+80,255,255);
+    leds[46]= CHSV(mew+80,255,255);
+    leds[47]= CHSV(mew+80,255,255);
+    leds[48]= CHSV(mew+80,255,255);
+    leds[49]= CHSV(mew+80,255,255);
+    FastLED.show();
+
+    hue=hue+20;
+    count++;
+    
+    if (count > 8){
+      hue = 0;
+      count = 0;
+    }
+
+    for(int k = 0; k <= 250; k=k+25) { 
+      for(int i = 0; i < 50; i++) { 
+        FastLED.setBrightness( k );
+      }
+      FastLED.delay(30);
+    }
+    FastLED.delay(100000);
+}
+
+#include<FastLED.h>
+#define NUM_LEDS 50
+
+CRGBArray<NUM_LEDS> leds;
+
+static uint8_t hue;
+static uint8_t hue_two;
+static uint8_t hue_three;
+static uint8_t nu;
+static uint8_t nu_two;
+static uint8_t nu_three;
+
+void setup() { 
+  FastLED.addLeds<NEOPIXEL,6>(leds, NUM_LEDS);
+    hue = random8(191);
+    hue_two = random8(191);
+    hue_three = random8(191);
+}
+
+void loop(){ 
+    // fade everything out
+    // let's set an led value
+    nu = random8(191);
+    nu_two = random8(191);
+    nu_three = random8(191);
+
+    if(hue-10 < nu ){
+      if(nu < hue+10){
+        if(nu < 100){
+          nu = nu + 30;
+        }else{
+          nu = nu - 30;
+        }
+      }
+    }
+
+    if(hue_two-10 < nu_two ){
+      if(nu_two < hue_two+10){
+        if(nu_two < 100){
+          nu_two = nu_two + 50;
+        }else{
+          nu_two = nu_two - 50;
+        }
+      }
+    }
+
+    if(hue_three-10 < nu_three ){
+      if(nu_three < hue_three+10){
+        if(nu_three < 100){
+          nu_three = nu_three + 30;
+        }else{
+          nu_three = nu_three - 30;
+        }
+      }
+    }
+
+    hue = nu;
+    hue_two = nu_two;
+    hue_three = nu_three;
+
+    leds[0]= CHSV(hue,255,255);FastLED.show();FastLED.delay(30);
+    leds[1]= CHSV(hue,255,255);FastLED.show();FastLED.delay(30);
+    leds[2]= CHSV(hue,255,255);FastLED.show();FastLED.delay(30);
+    leds[3]= CHSV(hue,255,255);FastLED.show();FastLED.delay(30);
+    leds[4]= CHSV(hue,255,255);FastLED.show();FastLED.delay(30);
+    leds[5]= CHSV(hue,255,255);FastLED.show();FastLED.delay(30);
+    leds[6]= CHSV(hue,255,255);FastLED.show();FastLED.delay(30);
+    leds[6]= CHSV(hue,255,255);FastLED.show();FastLED.delay(30);
+    leds[7]= CHSV(hue,255,255);FastLED.show();FastLED.delay(30);
+    leds[8]= CHSV(hue,255,255);FastLED.show();FastLED.delay(30);
+    leds[9]= CHSV(hue,255,255);FastLED.show();FastLED.delay(30);
+    leds[10]= CHSV(hue,255,255);FastLED.show();FastLED.delay(30);
+    leds[11]= CHSV(hue,255,255);FastLED.show();FastLED.delay(30);
+    leds[17]= CHSV(hue,255,255);FastLED.show();FastLED.delay(30);
+    leds[18]= CHSV(hue,255,255);FastLED.show();FastLED.delay(30);
+    leds[19]= CHSV(hue,255,255);FastLED.show();FastLED.delay(30);
+    leds[20]= CHSV(hue,255,255);FastLED.show();FastLED.delay(30);
+    leds[26]= CHSV(hue,255,255);FastLED.show();FastLED.delay(30);
+    leds[27]= CHSV(hue,255,255);FastLED.show();FastLED.delay(30);
+    leds[28]= CHSV(hue,255,255);FastLED.show();FastLED.delay(30);
+    leds[29]= CHSV(hue,255,255);FastLED.show();FastLED.delay(30);
+
+    leds[12]= CHSV(hue_two,255,255);FastLED.show();FastLED.delay(30);
+    leds[13]= CHSV(hue_two,255,255);FastLED.show();FastLED.delay(30);
+    leds[14]= CHSV(hue_two,255,255);FastLED.show();FastLED.delay(30);
+    leds[15]= CHSV(hue_two,255,255);FastLED.show();FastLED.delay(30);
+    leds[16]= CHSV(hue_two,255,255);FastLED.show();FastLED.delay(30);
+    leds[21]= CHSV(hue_two,255,255);FastLED.show();FastLED.delay(30);
+    leds[22]= CHSV(hue_two,255,255);FastLED.show();FastLED.delay(30);
+    leds[23]= CHSV(hue_two,255,255);FastLED.show();FastLED.delay(30);
+    leds[24]= CHSV(hue_two,255,255);FastLED.show();FastLED.delay(30);
+    leds[25]= CHSV(hue_two,255,255);FastLED.show();FastLED.delay(30);
+  
+    leds[30]= CHSV(hue_three,255,255);FastLED.show();FastLED.delay(30);
+    leds[31]= CHSV(hue_three,255,255);FastLED.show();FastLED.delay(30);
+    leds[32]= CHSV(hue_three,255,255);FastLED.show();FastLED.delay(30);
+    leds[33]= CHSV(hue_three,255,255);FastLED.show();FastLED.delay(30);
+    leds[34]= CHSV(hue_three,255,255);FastLED.show();FastLED.delay(30);
+    leds[35]= CHSV(hue_three,255,255);FastLED.show();FastLED.delay(30);
+    leds[45]= CHSV(hue_three,255,255);FastLED.show();FastLED.delay(30);
+    leds[41]= CHSV(hue_three,255,255);FastLED.show();FastLED.delay(30);
+    leds[42]= CHSV(hue_three,255,255);FastLED.show();FastLED.delay(30);
+
+    leds[36]= CHSV(hue_three,255,255);FastLED.show();FastLED.delay(30);
+    leds[37]= CHSV(hue_three,255,255);FastLED.show();FastLED.delay(30);
+    leds[38]= CHSV(hue_three,255,255);FastLED.show();FastLED.delay(30);
+    leds[39]= CHSV(hue_three,255,255);FastLED.show();FastLED.delay(30);
+    leds[40]= CHSV(hue_three,255,255);FastLED.show();FastLED.delay(30);
+    leds[43]= CHSV(hue_three,255,255);FastLED.show();FastLED.delay(30);
+    leds[44]= CHSV(hue_three,255,255);FastLED.show();FastLED.delay(30);
+    leds[46]= CHSV(hue_three,255,255);FastLED.show();FastLED.delay(30);
+    leds[47]= CHSV(hue_three,255,255);FastLED.show();FastLED.delay(30);
+    leds[48]= CHSV(hue_three,255,255);FastLED.show();FastLED.delay(30);
+    leds[49]= CHSV(hue_three,255,255);FastLED.show();FastLED.delay(30);
+
+    FastLED.delay(5000);
+}
+
+#include "FastLED.h"
+#define NUM_LEDS 50
+CRGBArray<NUM_LEDS> leds;
+int buttonPin = 10;
+int funcNum = 1;
+static uint8_t hue;
+static uint8_t hue_two;
+static uint8_t hue_three;
+static uint8_t nu;
+static uint8_t nu_two;
+static uint8_t nu_three;
+
+void setup() {
+   // Define pin #12 as input and activate the internal pull-up resistor
+   pinMode(buttonPin, INPUT_PULLUP);
+   // Define pin #13 as output, for the LED
+   FastLED.addLeds<NEOPIXEL, 6>(leds, NUM_LEDS); 
+    hue = random8(191);
+    hue_two = random8(191);
+    hue_three = random8(191);
+}
+
+void scaleColor(int li, uint8_t color){
+    for(int k = 0; k <= 250; k=k+25) { 
+      leds[li]= CHSV(color,k,k);
+      FastLED.delay(20);
+    }
+}
+
+
+void colorCheck(uint8_t hue, uint8_t hue_two, uint8_t hue_three){
+     // let's set an led value
+    nu = random8(191);
+    nu_two = random8(191);
+    nu_three = random8(191);
+
+    if(hue-10 < nu ){
+      if(nu < hue+10){
+        if(nu < 100){
+          nu = nu + 30;
+        }else{
+          nu = nu - 30;
+        }
+      }
+    }
+
+    if(hue_two-10 < nu_two ){
+      if(nu_two < hue_two+10){
+        if(nu_two < 100){
+          nu_two = nu_two + 50;
+        }else{
+          nu_two = nu_two - 50;
+        }
+      }
+    }
+
+    if(hue_three-10 < nu_three ){
+      if(nu_three < hue_three+10){
+        if(nu_three < 100){
+          nu_three = nu_three + 30;
+        }else{
+          nu_three = nu_three - 30;
+        }
+      }
+    }
+}
+
+void swapFunc(int func){
+   colorCheck(hue, hue_two, hue_three);
+    if(func == 1){
+      leds[0]= CHSV(hue,0,0);scaleColor(0,hue);FastLED.show();FastLED.delay(0);
+      leds[1]= CHSV(hue,0,0);scaleColor(1,hue);FastLED.show();FastLED.delay(0);
+      leds[2]= CHSV(hue,0,0);scaleColor(2,hue);FastLED.show();FastLED.delay(0);
+      leds[3]= CHSV(hue,0,0);scaleColor(3,hue);FastLED.show();FastLED.delay(0);
+      leds[4]= CHSV(hue,0,0);scaleColor(4,hue);FastLED.show();FastLED.delay(0);
+      leds[5]= CHSV(hue,0,0);scaleColor(5,hue);FastLED.show();FastLED.delay(0);
+      leds[6]= CHSV(hue,0,0);scaleColor(6,hue);FastLED.show();FastLED.delay(0);
+      leds[7]= CHSV(hue,0,0);scaleColor(7,hue);FastLED.show();FastLED.delay(0);
+      leds[8]= CHSV(hue,0,0);scaleColor(8,hue);FastLED.show();FastLED.delay(0);
+      leds[9]= CHSV(hue,0,0);scaleColor(9,hue);FastLED.show();FastLED.delay(0);
+      leds[10]= CHSV(hue,0,0);scaleColor(10,hue);FastLED.show();FastLED.delay(0);
+      leds[11]= CHSV(hue,0,0);scaleColor(11,hue);FastLED.show();FastLED.delay(0);
+      leds[17]= CHSV(hue,0,0);scaleColor(17,hue);FastLED.show();FastLED.delay(0);
+      leds[18]= CHSV(hue,0,0);scaleColor(18,hue);FastLED.show();FastLED.delay(0);
+      leds[19]= CHSV(hue,0,0);scaleColor(19,hue);FastLED.show();FastLED.delay(0);
+      leds[20]= CHSV(hue,0,0);scaleColor(20,hue);FastLED.show();FastLED.delay(0);
+      leds[26]= CHSV(hue,0,0);scaleColor(26,hue);FastLED.show();FastLED.delay(0);
+      leds[27]= CHSV(hue,0,0);scaleColor(27,hue);FastLED.show();FastLED.delay(0);
+      leds[28]= CHSV(hue,0,0);scaleColor(28,hue);FastLED.show();FastLED.delay(0);
+      leds[29]= CHSV(hue,0,0);scaleColor(29,hue);FastLED.show();FastLED.delay(0);
+
+      leds[12]= CHSV(hue_two,0,0);scaleColor(12,hue_two);FastLED.show();FastLED.delay(0);
+      leds[13]= CHSV(hue_two,0,0);scaleColor(13,hue_two);FastLED.show();FastLED.delay(0);
+      leds[14]= CHSV(hue_two,0,0);scaleColor(14,hue_two);FastLED.show();FastLED.delay(0);
+      leds[15]= CHSV(hue_two,0,0);scaleColor(15,hue_two);FastLED.show();FastLED.delay(0);
+      leds[16]= CHSV(hue_two,0,0);scaleColor(16,hue_two);FastLED.show();FastLED.delay(0);
+      leds[21]= CHSV(hue_two,0,0);scaleColor(21,hue_two);FastLED.show();FastLED.delay(0);
+      leds[22]= CHSV(hue_two,0,0);scaleColor(22,hue_two);FastLED.show();FastLED.delay(0);
+      leds[23]= CHSV(hue_two,0,0);scaleColor(23,hue_two);FastLED.show();FastLED.delay(0);
+      leds[24]= CHSV(hue_two,0,0);scaleColor(24,hue_two);FastLED.show();FastLED.delay(0);
+      leds[25]= CHSV(hue_two,0,0);scaleColor(25,hue_two);FastLED.show();FastLED.delay(0);
+      
+      leds[30]= CHSV(hue_three,0,0);scaleColor(30,hue_three);FastLED.show();FastLED.delay(0);
+      leds[31]= CHSV(hue_three,0,0);scaleColor(31,hue_three);FastLED.show();FastLED.delay(0);
+      leds[32]= CHSV(hue_three,0,0);scaleColor(32,hue_three);FastLED.show();FastLED.delay(0);
+      leds[33]= CHSV(hue_three,0,0);scaleColor(33,hue_three);FastLED.show();FastLED.delay(0);
+      leds[34]= CHSV(hue_three,0,0);scaleColor(34,hue_three);FastLED.show();FastLED.delay(0);
+      leds[35]= CHSV(hue_three,0,0);scaleColor(35,hue_three);FastLED.show();FastLED.delay(0);
+      leds[45]= CHSV(hue_three,0,0);scaleColor(45,hue_three);FastLED.show();FastLED.delay(0);
+      leds[41]= CHSV(hue_three,0,0);scaleColor(41,hue_three);FastLED.show();FastLED.delay(0);
+      leds[42]= CHSV(hue_three,0,0);scaleColor(42,hue_three);FastLED.show();FastLED.delay(0);
+
+      leds[36]= CHSV(hue_three,0,0);scaleColor(36,hue_three);FastLED.show();FastLED.delay(0);
+      leds[37]= CHSV(hue_three,0,0);scaleColor(37,hue_three);FastLED.show();FastLED.delay(0);
+      leds[38]= CHSV(hue_three,0,0);scaleColor(38,hue_three);FastLED.show();FastLED.delay(0);
+      leds[39]= CHSV(hue_three,0,0);scaleColor(39,hue_three);FastLED.show();FastLED.delay(0);
+      leds[40]= CHSV(hue_three,0,0);scaleColor(40,hue_three);FastLED.show();FastLED.delay(0);
+      leds[43]= CHSV(hue_three,0,0);scaleColor(43,hue_three);FastLED.show();FastLED.delay(0);
+      leds[44]= CHSV(hue_three,0,0);scaleColor(44,hue_three);FastLED.show();FastLED.delay(0);
+      leds[46]= CHSV(hue_three,0,0);scaleColor(46,hue_three);FastLED.show();FastLED.delay(0);
+      leds[47]= CHSV(hue_three,0,0);scaleColor(47,hue_three);FastLED.show();FastLED.delay(0);
+      leds[48]= CHSV(hue_three,0,0);scaleColor(48,hue_three);FastLED.show();FastLED.delay(0);
+      leds[49]= CHSV(hue_three,0,0);scaleColor(49,hue_three);FastLED.show();FastLED.delay(0);
+    }else{
+      leds[0].setRGB( 14, 50, 50);FastLED.show();
+      leds[1].setRGB( 14, 50, 50);FastLED.show();
+      leds[2].setRGB( 14, 50, 50);FastLED.show();
+      leds[3].setRGB( 14, 50, 50);FastLED.show();
+      leds[4].setRGB( 14, 50, 50);FastLED.show();
+      leds[5].setRGB( 14, 50, 50);FastLED.show();
+      leds[6].setRGB( 14, 50, 50);FastLED.show();
+      leds[7].setRGB( 14, 50, 50);FastLED.show();
+      leds[8].setRGB( 14, 50, 50);FastLED.show();
+      leds[9].setRGB( 14, 50, 50);FastLED.show();
+      leds[10].setRGB( 14, 50, 50);FastLED.show();
+      leds[11].setRGB( 14, 50, 50);FastLED.show();
+      leds[17].setRGB( 14, 50, 50);FastLED.show();
+      leds[18].setRGB( 14, 50, 50);FastLED.show();
+      leds[19].setRGB( 14, 50, 50);FastLED.show();
+      leds[20].setRGB( 14, 50, 50);FastLED.show();
+      leds[26].setRGB( 14, 50, 50);FastLED.show();
+      leds[27].setRGB( 14, 50, 50);FastLED.show();
+      leds[28].setRGB( 14, 50, 50);FastLED.show();
+      leds[29].setRGB( 14, 50, 50);FastLED.show();
+      leds[30].setRGB( 14, 50, 50);FastLED.show();
+      leds[31].setRGB( 14, 50, 50);FastLED.show();
+      leds[36].setRGB( 14, 50, 50);FastLED.show();
+      leds[37].setRGB( 14, 50, 50);FastLED.show();
+      leds[38].setRGB( 14, 50, 50);FastLED.show();
+      leds[46].setRGB( 14, 50, 50);FastLED.show();
+      leds[47].setRGB( 14, 50, 50);FastLED.show();
+      leds[48].setRGB( 14, 50, 50);FastLED.show();
+      leds[49].setRGB( 14, 50, 50);FastLED.show();
+    }
+}
+
+void loop(){
+   // Read the value of the input. It can either be 1 or 0
+   int buttonValue = digitalRead(buttonPin);
+   if (buttonValue == LOW){
+      if(funcNum > 2){
+         funcNum = 1;
+      }
+      swapFunc(funcNum);
+      funcNum++;
+      FastLED.delay(100);
+      // If button pushed, turn LED on
+
+   } else {
+   }
+}
+
+
+
+================================new stufff=============================
+#include "FastLED.h"
+#define NUM_LEDS 50
+CRGBArray<NUM_LEDS> leds;
+int buttonPin = 10;
+int funcNum = 1;
+static uint8_t hue;
+static uint8_t hue_two;
+static uint8_t hue_three;
+static uint8_t nu;
+static uint8_t nu_two;
+static uint8_t nu_three;
+static uint8_t mew;
+
+void setup() {
+   // Define pin #12 as input and activate the internal pull-up resistor
+   pinMode(buttonPin, INPUT_PULLUP);
+   // Define pin #13 as output, for the LED
+   FastLED.addLeds<NEOPIXEL, 6>(leds, NUM_LEDS); 
+    hue = random8(191);
+    hue_two = random8(191);
+    hue_three = random8(191);
+}
+
+void scaleColor(int li, uint8_t color){
+    for(int k = 0; k <= 250; k=k+25) { 
+      leds[li]= CHSV(color,k,k);
+      FastLED.delay(20);
+    }
+}
+
+
+void colorCheck(){
+    hue = hue + 6.75;
+    hue_two = hue + 12.81;
+    hue_three = hue + 25.66;
+
+    if(hue_three > 195){
+      hue = hue_three - hue_two;
+    }
+}
+
+void swapFunc(int func){
+    colorCheck();
+    if(func == 1){
+      leds[0]= CHSV(hue,0,0);scaleColor(0,hue);FastLED.show();FastLED.delay(0);
+      leds[1]= CHSV(hue,0,0);scaleColor(1,hue);FastLED.show();FastLED.delay(0);
+      leds[2]= CHSV(hue,0,0);scaleColor(2,hue);FastLED.show();FastLED.delay(0);
+      leds[3]= CHSV(hue,0,0);scaleColor(3,hue);FastLED.show();FastLED.delay(0);
+      leds[4]= CHSV(hue,0,0);scaleColor(4,hue);FastLED.show();FastLED.delay(0);
+      leds[5]= CHSV(hue,0,0);scaleColor(5,hue);FastLED.show();FastLED.delay(0);
+      leds[6]= CHSV(hue,0,0);scaleColor(6,hue);FastLED.show();FastLED.delay(0);
+      leds[7]= CHSV(hue,0,0);scaleColor(7,hue);FastLED.show();FastLED.delay(0);
+      leds[8]= CHSV(hue,0,0);scaleColor(8,hue);FastLED.show();FastLED.delay(0);
+      leds[9]= CHSV(hue,0,0);scaleColor(9,hue);FastLED.show();FastLED.delay(0);
+      leds[10]= CHSV(hue,0,0);scaleColor(10,hue);FastLED.show();FastLED.delay(0);
+      leds[11]= CHSV(hue,0,0);scaleColor(11,hue);FastLED.show();FastLED.delay(0);
+      leds[17]= CHSV(hue,0,0);scaleColor(17,hue);FastLED.show();FastLED.delay(0);
+      leds[18]= CHSV(hue,0,0);scaleColor(18,hue);FastLED.show();FastLED.delay(0);
+      leds[19]= CHSV(hue,0,0);scaleColor(19,hue);FastLED.show();FastLED.delay(0);
+      leds[20]= CHSV(hue,0,0);scaleColor(20,hue);FastLED.show();FastLED.delay(0);
+      leds[26]= CHSV(hue,0,0);scaleColor(26,hue);FastLED.show();FastLED.delay(0);
+      leds[27]= CHSV(hue,0,0);scaleColor(27,hue);FastLED.show();FastLED.delay(0);
+      leds[28]= CHSV(hue,0,0);scaleColor(28,hue);FastLED.show();FastLED.delay(0);
+      leds[29]= CHSV(hue,0,0);scaleColor(29,hue);FastLED.show();FastLED.delay(0);
+
+      leds[12]= CHSV(hue_two,0,0);scaleColor(12,hue_two);FastLED.show();FastLED.delay(0);
+      leds[13]= CHSV(hue_two,0,0);scaleColor(13,hue_two);FastLED.show();FastLED.delay(0);
+      leds[14]= CHSV(hue_two,0,0);scaleColor(14,hue_two);FastLED.show();FastLED.delay(0);
+      leds[15]= CHSV(hue_two,0,0);scaleColor(15,hue_two);FastLED.show();FastLED.delay(0);
+      leds[16]= CHSV(hue_two,0,0);scaleColor(16,hue_two);FastLED.show();FastLED.delay(0);
+      leds[21]= CHSV(hue_two,0,0);scaleColor(21,hue_two);FastLED.show();FastLED.delay(0);
+      leds[22]= CHSV(hue_two,0,0);scaleColor(22,hue_two);FastLED.show();FastLED.delay(0);
+      leds[23]= CHSV(hue_two,0,0);scaleColor(23,hue_two);FastLED.show();FastLED.delay(0);
+      leds[24]= CHSV(hue_two,0,0);scaleColor(24,hue_two);FastLED.show();FastLED.delay(0);
+      leds[25]= CHSV(hue_two,0,0);scaleColor(25,hue_two);FastLED.show();FastLED.delay(0);
+      
+      leds[30]= CHSV(hue_three,0,0);scaleColor(30,hue_three);FastLED.show();FastLED.delay(0);
+      leds[31]= CHSV(hue_three,0,0);scaleColor(31,hue_three);FastLED.show();FastLED.delay(0);
+      leds[32]= CHSV(hue_three,0,0);scaleColor(32,hue_three);FastLED.show();FastLED.delay(0);
+      leds[33]= CHSV(hue_three,0,0);scaleColor(33,hue_three);FastLED.show();FastLED.delay(0);
+      leds[34]= CHSV(hue_three,0,0);scaleColor(34,hue_three);FastLED.show();FastLED.delay(0);
+      leds[35]= CHSV(hue_three,0,0);scaleColor(35,hue_three);FastLED.show();FastLED.delay(0);
+      leds[45]= CHSV(hue_three,0,0);scaleColor(45,hue_three);FastLED.show();FastLED.delay(0);
+      leds[41]= CHSV(hue_three,0,0);scaleColor(41,hue_three);FastLED.show();FastLED.delay(0);
+      leds[42]= CHSV(hue_three,0,0);scaleColor(42,hue_three);FastLED.show();FastLED.delay(0);
+
+      leds[36]= CHSV(hue_three,0,0);scaleColor(36,hue_three);FastLED.show();FastLED.delay(0);
+      leds[37]= CHSV(hue_three,0,0);scaleColor(37,hue_three);FastLED.show();FastLED.delay(0);
+      leds[38]= CHSV(hue_three,0,0);scaleColor(38,hue_three);FastLED.show();FastLED.delay(0);
+      leds[39]= CHSV(hue_three,0,0);scaleColor(39,hue_three);FastLED.show();FastLED.delay(0);
+      leds[40]= CHSV(hue_three,0,0);scaleColor(40,hue_three);FastLED.show();FastLED.delay(0);
+      leds[43]= CHSV(hue_three,0,0);scaleColor(43,hue_three);FastLED.show();FastLED.delay(0);
+      leds[44]= CHSV(hue_three,0,0);scaleColor(44,hue_three);FastLED.show();FastLED.delay(0);
+      leds[46]= CHSV(hue_three,0,0);scaleColor(46,hue_three);FastLED.show();FastLED.delay(0);
+      leds[47]= CHSV(hue_three,0,0);scaleColor(47,hue_three);FastLED.show();FastLED.delay(0);
+      leds[48]= CHSV(hue_three,0,0);scaleColor(48,hue_three);FastLED.show();FastLED.delay(0);
+      leds[49]= CHSV(hue_three,0,0);scaleColor(49,hue_three);FastLED.show();FastLED.delay(0);
+    }
+    if(func == 2){
+      for(int k = 250; k >= 0; k=k-25) { 
+        for(int i = 0; i < 50; i++) { 
+          FastLED.setBrightness( k );
+        }
+        FastLED.delay(30);
+      }
+      mew = hue;
+      leds[0]= CHSV(mew,255,255);
+      leds[1]= CHSV(mew,255,255);
+      leds[2]= CHSV(mew,255,255);
+      leds[3]= CHSV(mew,255,255);
+      leds[4]= CHSV(mew,255,255);
+      leds[5]= CHSV(mew,255,255);
+      leds[6]= CHSV(mew,255,255);
+      leds[7]= CHSV(mew,255,255);
+      leds[8]= CHSV(mew,255,255);
+      leds[9]= CHSV(mew,255,255);
+      leds[10]= CHSV(mew,255,255);
+      leds[11]= CHSV(mew,255,255);
+      leds[17]= CHSV(mew,255,255);
+      leds[18]= CHSV(mew,255,255);
+      leds[19]= CHSV(mew,255,255);
+      leds[20]= CHSV(mew,255,255);
+      leds[26]= CHSV(mew,255,255);
+      leds[27]= CHSV(mew,255,255);
+      leds[28]= CHSV(mew,255,255);
+      leds[29]= CHSV(mew,255,255);
+
+      leds[12]= CHSV((mew+50),255,255);
+      leds[13]= CHSV((mew+50),255,255);
+      leds[14]= CHSV((mew+50),255,255);
+      leds[15]= CHSV((mew+50),255,255);
+      leds[16]= CHSV((mew+50),255,255);
+      leds[21]= CHSV((mew+50),255,255);
+      leds[22]= CHSV((mew+50),255,255);
+      leds[23]= CHSV((mew+50),255,255);
+      leds[24]= CHSV((mew+50),255,255);
+      leds[25]= CHSV((mew+50),255,255);
+      
+      leds[30]= CHSV(mew+80,255,255);
+      leds[31]= CHSV(mew+80,255,255);
+      leds[32]= CHSV(mew+80,255,255);
+      leds[33]= CHSV(mew+80,255,255);
+      leds[34]= CHSV(mew+80,255,255);
+      leds[35]= CHSV(mew+80,255,255);
+      leds[45]= CHSV(mew+80,255,255);
+      leds[41]= CHSV(mew+80,255,255);
+      leds[42]= CHSV(mew+80,255,255);
+
+      leds[36]= CHSV(mew+80,255,255);
+      leds[37]= CHSV(mew+80,255,255);
+      leds[38]= CHSV(mew+80,255,255);
+      leds[39]= CHSV(mew+80,255,255);
+      leds[40]= CHSV(mew+80,255,255);
+      leds[43]= CHSV(mew+80,255,255);
+      leds[44]= CHSV(mew+80,255,255);
+      leds[46]= CHSV(mew+80,255,255);
+      leds[47]= CHSV(mew+80,255,255);
+      leds[48]= CHSV(mew+80,255,255);
+      leds[49]= CHSV(mew+80,255,255);
+      FastLED.show();
+      for(int k = 0; k <= 250; k=k+25) { 
+        for(int i = 0; i < 50; i++) { 
+          FastLED.setBrightness( k );
+        }
+        FastLED.delay(30);
+      }
+    }
+    if(func == 3){
+      leds[0].setRGB( 14, 50, 50);FastLED.show();
+      leds[1].setRGB( 14, 50, 50);FastLED.show();
+      leds[2].setRGB( 14, 50, 50);FastLED.show();
+      leds[3].setRGB( 14, 50, 50);FastLED.show();
+      leds[4].setRGB( 14, 50, 50);FastLED.show();
+      leds[5].setRGB( 14, 50, 50);FastLED.show();
+      leds[6].setRGB( 14, 50, 50);FastLED.show();
+      leds[7].setRGB( 14, 50, 50);FastLED.show();
+      leds[8].setRGB( 14, 50, 50);FastLED.show();
+      leds[9].setRGB( 14, 50, 50);FastLED.show();
+      leds[10].setRGB( 14, 50, 50);FastLED.show();
+      leds[11].setRGB( 14, 50, 50);FastLED.show();
+      leds[17].setRGB( 14, 50, 50);FastLED.show();
+      leds[18].setRGB( 14, 50, 50);FastLED.show();
+      leds[19].setRGB( 14, 50, 50);FastLED.show();
+      leds[20].setRGB( 14, 50, 50);FastLED.show();
+      leds[26].setRGB( 14, 50, 50);FastLED.show();
+      leds[27].setRGB( 14, 50, 50);FastLED.show();
+      leds[28].setRGB( 14, 50, 50);FastLED.show();
+      leds[29].setRGB( 14, 50, 50);FastLED.show();
+      leds[30].setRGB( 14, 50, 50);FastLED.show();
+      leds[31].setRGB( 14, 50, 50);FastLED.show();
+      leds[36].setRGB( 14, 50, 50);FastLED.show();
+      leds[37].setRGB( 14, 50, 50);FastLED.show();
+      leds[38].setRGB( 14, 50, 50);FastLED.show();
+      leds[46].setRGB( 14, 50, 50);FastLED.show();
+      leds[47].setRGB( 14, 50, 50);FastLED.show();
+      leds[48].setRGB( 14, 50, 50);FastLED.show();
+      leds[49].setRGB( 14, 50, 50);FastLED.show();
+    }
+}
+
+void loop(){
+   // Read the value of the input. It can either be 1 or 0
+   int buttonValue = digitalRead(buttonPin);
+   if (buttonValue == LOW){
+      if(funcNum > 3){
+         funcNum = 1;
+      }
+      swapFunc(funcNum);
+      funcNum++;
+      FastLED.delay(100);
+      // If button pushed, turn LED on
+
+   } else {
+      delay( 6000 );
+      swapFunc(funcNum);
+   }
+}

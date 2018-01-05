@@ -1,0 +1,62 @@
+/*
+ *  This sketch sends data via HTTP GET requests to data.sparkfun.com service.
+ *
+ *  You need to get streamId and privateKey at data.sparkfun.com and paste them
+ *  below. Or just customize this script to talk to other HTTP servers.
+ *
+ */
+
+#include <ESP8266WiFi.h>
+#include <ESP8266HTTPClient.h>
+
+const char* ssid     = "Cats in Space";
+const char* password = "meowmixer";
+
+const char* host = "data.sparkfun.com";
+const char* streamId   = "21mazG3lQ4INvN97ZVgV";
+const char* privateKey = "GZGKNgb5z1hGWGYZJ4E4";
+
+void setup() {
+  Serial.begin(115200);
+  delay(10);
+
+  // We start by connecting to a WiFi network
+
+  Serial.println();
+  Serial.println();
+  Serial.print("Connecting to ");
+  Serial.println(ssid);
+  
+  /* Explicitly set the ESP8266 to be a WiFi-client, otherwise, it by default,
+     would try to act as both a client and an access-point and could cause
+     network-issues with your other WiFi-devices on your WiFi-network. */
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid, password);
+  
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+
+  Serial.println("");
+  Serial.println("WiFi connected");  
+  Serial.println("IP address: ");
+  Serial.println(WiFi.localIP());
+}
+
+int value = 0;
+
+void loop() {
+ 
+  // This will send the request to the server
+  HTTPClient http;
+  http.begin("http://d0477d82.ngrok.io/scenes/kitty");
+  http.addHeader("Access-Control-Allow-Origin", "*");
+  http.GET();
+  http.writeToStream(&Serial);
+  http.end();
+  
+  Serial.println();
+  Serial.println("closing connection");
+  delay(1000000);
+}

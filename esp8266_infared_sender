@@ -1,0 +1,142 @@
+/*
+ * IRremoteESP8266: IRrecvDump - dump details of IR codes with IRrecv
+ * An IR detector/demodulator must be connected to the input RECV_PIN.
+ * Version 0.1 Sept, 2015
+ * Based on Ken Shirriff's IrsendDemo Version 0.1 July, 2009,
+ * Copyright 2009 Ken Shirriff, http://arcfn.com
+ * JVC and Panasonic protocol added by Kristian Lauszus
+ *   (Thanks to zenwheel and other people at the original blog post)
+ * LG added by Darryl Smith (based on the JVC protocol)
+ */
+#include "FS.h"
+#ifndef UNIT_TEST
+#include <Arduino.h>
+#endif
+#include <IRremoteESP8266.h>
+#include <IRrecv.h>
+#include <IRsend.h>
+#include <IRutils.h>
+#include <stdlib.h>     /* atoi */
+// an IR detector/demodulator is connected to GPIO pin 2
+uint16_t RECV_PIN = 14;
+uint16_t SEND_PIN = 12;
+
+IRrecv irrecv(RECV_PIN);
+IRsend irsend(SEND_PIN);
+
+decode_results results;
+
+char rawData[10000] = "8960, 4394, 604, 506, 608, 502, 604, 1616, 604, 504, 604, 506, 606, 504, 632, 478, 606, 504, 606, 1614, 606, 1614, 606, 502, 608, 1612, 608, 1614, 608, 1612, 606, 1614, 606, 1616, 602, 506, 606, 504, 606, 504, 608, 1612, 608, 502, 608, 502, 606, 504, 606, 504, 604, 1614, 606, 1614, 608, 1614, 604, 504, 606, 1614, 604, 1618, 628, 1592, 606, 1614, 630";
+const char s[3] = ", ";
+char *token;
+uint16_t crawlCall[200] = {};
+int while_count = 0;
+   
+   /* get the first token */
+
+uint16_t blawData[67] = {9000, 4500, 650, 550, 650, 1650, 600, 550, 650, 550,
+                        600, 1650, 650, 550, 600, 1650, 650, 1650, 650, 1650,
+                        600, 550, 650, 1650, 650, 1650, 650, 550, 600, 1650,
+                        650, 1650, 650, 550, 650, 550, 650, 1650, 650, 550,
+                        650, 550, 650, 550, 600, 550, 650, 550, 650, 550,
+                        650, 1650, 600, 550, 650, 1650, 650, 1650, 650, 1650,
+                        650, 1650, 650, 1650, 650, 1650, 600};
+                        
+void setup() {
+  Serial.begin(115200);
+  irrecv.enableIRIn();  // Start the receiver
+  irsend.begin();
+
+  bool result = SPIFFS.begin();
+  Serial.println("SPIFFS opened: " + result);
+  // open the file in write mode
+
+  File f = SPIFFS.open("/f.txt", "w");
+  f.println(rawData);
+  f.close();
+}
+
+void dump(decode_results *results) {
+  // Dumps out the decode_results structure.
+  // Call this after IRrecv::decode()
+  uint16_t count = results->rawlen;
+  if (results->decode_type == UNKNOWN) {
+    Serial.print("Unknown encoding: ");
+  } else if (results->decode_type == NEC) {
+    Serial.print("Decoded NEC: ");
+  } else if (results->decode_type == SONY) {
+    Serial.print("Decoded SONY: ");
+  } else if (results->decode_type == RC5) {
+    Serial.print("Decoded RC5: ");
+  } else if (results->decode_type == RC5X) {
+    Serial.print("Decoded RC5X: ");
+  } else if (results->decode_type == RC6) {
+    Serial.print("Decoded RC6: ");
+  } else if (results->decode_type == RCMM) {
+    Serial.print("Decoded RCMM: ");
+  } else if (results->decode_type == PANASONIC) {
+    Serial.print("Decoded PANASONIC - Address: ");
+    Serial.print(results->address, HEX);
+    Serial.print(" Value: ");
+  } else if (results->decode_type == LG) {
+    Serial.print("Decoded LG: ");
+  } else if (results->decode_type == JVC) {
+    Serial.print("Decoded JVC: ");
+  } else if (results->decode_type == AIWA_RC_T501) {
+    Serial.print("Decoded AIWA RC T501: ");
+  } else if (results->decode_type == WHYNTER) {
+    Serial.print("Decoded Whynter: ");
+  }
+  serialPrintUint64(results->value, 16);
+  Serial.print(" (");
+  Serial.print(results->bits, DEC);
+  Serial.println(" bits)");
+  Serial.print("Raw (");
+  Serial.print(count, DEC);
+  Serial.print("): ");
+
+  for (uint16_t i = 1; i < count; i++) {
+    if (i % 100 == 0)
+      yield();  // Preemptive yield every 100th entry to feed the WDT.
+    if (i & 1) {
+      Serial.print(results->rawbuf[i] * RAWTICK, DEC);
+    } else {
+      //Serial.write('-');
+      Serial.print((uint32_t) results->rawbuf[i] * RAWTICK, DEC);
+    }
+    Serial.print(", ");
+  }
+  Serial.println();
+}
+char* copy(const char* orig) {
+  char *res = new char[strlen(orig)+1];
+  strcpy(res, orig);
+  return res;
+};
+void loop() {
+  if (irrecv.decode(&results)) {
+    serialPrintUint64(results.value, 16);
+    dump(&results);
+    irrecv.resume();  // Receive the next value
+  }  
+  File f = SPIFFS.open("/f.txt", "r");
+    // we could open the file
+  while(f.available()) {
+    //Lets read line by line from the file
+    String line = f.readStringUntil('\n');
+    const char *char_line = line.c_str();
+    char *clean_line = copy(char_line);
+   token = strtok(clean_line, s);
+   while( token != NULL ) 
+   {
+      int i =  atoi (token);
+      crawlCall[while_count] = i;
+      token = strtok(NULL, s);
+      while_count++;
+   }
+   delete[] clean_line;
+  }
+  f.close();
+  irsend.sendRaw(crawlCall, 67, 38);
+  delay(5000);
+}
