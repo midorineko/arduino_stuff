@@ -1,0 +1,648 @@
+#define FASTLED_ESP8266_RAW_PIN_ORDER
+#define FASTLED_INTERNAL
+#define FASTLED_INTERRUPT_RETRY_COUNT 0
+#define FASTLED_ALLOW_INTERRUPTS 0
+
+
+#include "FastLED.h"
+#include <ESP8266WiFi.h>
+#include <WiFiClient.h> 
+#include <ESP8266WebServer.h>
+#include <DNSServer.h>
+#include <ESP8266mDNS.h>
+
+const char *softAP_ssid = "Infinity Clock by Mr CatNaps";
+const char *softAP_password = "12345678";
+const char *myHostname = "Infinity Clock by Mr CatNaps";
+
+const byte DNS_PORT = 53;
+DNSServer dnsServer;
+
+// Web server
+ESP8266WebServer server(80);
+
+/* Soft AP network parameters */
+IPAddress apIP(192, 168, 4, 1);
+IPAddress netMsk(255, 255, 255, 0);
+/** Last time I tried to connect to WLAN */
+long lastConnectTry = 0;
+
+/** Current WLAN status */
+int status = WL_IDLE_STATUS;
+
+#define FASTLED_ESP8266_RAW_PIN_ORDER
+
+#if defined(FASTLED_VERSION) && (FASTLED_VERSION < 3001000)
+#warning "Requires FastLED 3.1 or later; check github for latest code."
+#endif
+
+#define DATA_PIN    15
+//#define CLK_PIN   4
+#define LED_TYPE    WS2812B
+#define COLOR_ORDER GRB
+#define NUM_LEDS    68
+CRGB leds[NUM_LEDS];
+
+int BRIGHTNESS    =      255;
+#define FRAMES_PER_SECOND  120
+
+uint8_t BeatsPerMinute = 62;
+
+int r = 0;
+int g = 0;
+int b = 0;
+bool homemade_method = false;
+
+//start infinity clock
+int r_clock = 0;
+int g_clock = 20;
+int b_clock = 20;
+int ro_clock = 0;
+int go_clock = 20;
+int bo_clock = 20;
+int zero_point = 25;
+int min_set = 22;
+int sec_set = 25;
+int hour_set = 10;
+int sec = sec_set;
+int sec_old = sec_set;
+int mins = min_set;
+int mins_old = min_set;
+bool set_min = true;
+int hours = hour_set;
+int hours_old = hour_set + 1;
+bool sec_is_hour = false;
+bool min_is_hour = false;
+bool clock_on = false;
+//end infinity clock
+
+void setup() {
+  FastLED.addLeds<LED_TYPE,DATA_PIN,COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  FastLED.setBrightness(BRIGHTNESS);
+  Serial.begin(115200);
+  Serial.println();
+  Serial.print("Configuring access point...");
+  delay(1000);
+  WiFi.softAPConfig(apIP, apIP, netMsk);
+  WiFi.softAP(softAP_ssid, softAP_password);
+  delay(500); // Without delay I've seen the IP address blank
+  Serial.print("AP IP address: ");
+  Serial.println(WiFi.softAPIP());
+  dnsServer.setErrorReplyCode(DNSReplyCode::NoError);
+  dnsServer.start(DNS_PORT, "www.example.com", apIP);
+
+  server.on("/", handleRoot);
+  server.on("/rainbow", rainbow_call);
+  server.on("/rainbowWithGlitter", rainbowWithGlitter_call);
+  server.on("/confetti", confetti_call);
+  server.on("/sinelon", sinelon_call);
+
+  server.on("/juggle", juggle_call);
+  server.on("/next", next_call);
+
+  server.on("/clock", clock_call);
+
+  server.on("/bpm", [](){
+    int beats = server.arg("beats").toInt();
+    if (beats){
+        uint8_t BeatsPerMinute = beats;
+    }
+    bpm_call();
+  });
+
+  server.on("/solid", [](){
+    homemade_method = true;
+    clock_on = false;
+    r = server.arg("r").toInt();
+    g = server.arg("g").toInt();
+    b = server.arg("b").toInt();
+    solid_loop();
+    handleRoot();
+  });
+
+  server.on("/brightDown", [](){
+    int ammount = server.arg("a").toInt();
+    BRIGHTNESS -= ammount;
+    FastLED.setBrightness(BRIGHTNESS);
+    if(homemade_method){
+      solid_loop();
+    };
+    handleRoot();
+  });
+  server.on("/brightUp", [](){
+    int ammount = server.arg("a").toInt();
+    BRIGHTNESS -= ammount;
+    FastLED.setBrightness(BRIGHTNESS);
+    if(homemade_method){
+      solid_loop();
+    };
+    handleRoot();
+  });
+  server.on("/increase", [](){
+    int color = server.arg("c").toInt();
+    int ammount = server.arg("a").toInt();
+    if(color == 1){
+      r += ammount;
+    }
+    if(color == 2){
+      g+=ammount;
+    }
+    if(color == 3){
+      b+=ammount;
+    }
+    homemade_method = true;
+    clock_on = false;
+    solid_loop();
+    handleRoot();
+  });
+  server.on("/decrease", [](){
+    int color = server.arg("c").toInt();
+    int ammount = server.arg("a").toInt();
+    if(color == 1){
+      r -= ammount;
+    }
+    if(color == 2){
+      g -= ammount;
+    }
+    if(color == 3){
+      b -= ammount;
+    }
+    homemade_method = true;
+    clock_on = false;
+    solid_loop();
+    handleRoot();
+  });
+
+
+  server.onNotFound ( handleNotFound );
+  server.begin(); // Web server start
+  Serial.println("HTTP server started");
+  confetti_call();
+}
+
+String htmlTemplateTop = "<html><head><style>"
+  "* {box-sizing: border-box;}"
+  "body {font-family: Sans-serif;background: #edece7;}"
+  ".switch {display: block;position: relative;width: 70px;height: 100px;margin: 70px auto;border-radius: 50px;background: #e6e3da;background: linear-gradient(#e6e3da, #fff);border: 1px solid rgba(0,0,0,0.1);box-shadow: inset 0 7px 0 #fdfdfd,0 2px 3px rgba(170, 160, 140,.3);cursor: pointer;}"
+  ".switch:before {content: '';position: absolute;top: -10px; bottom: -10px;left: -5px; right: -5px;z-index: -1;background: #f2f1ed;border-radius: inherit;box-shadow:0 1px 1px rgba(#aea391,0.2),0 3px 3px rgba(170, 160, 140, 0.4),inset 0 1px 0 rgba(255,255,255,0.8),0 0 5px rgba(170, 160, 140, 0.5);}"
+  ".switch:after {content: "";position:absolute;width: 60px;height: 70px;border-radius: 50%;z-index: -1;left: 18px;top: 10px;background: linear-gradient(160deg, rgba(170, 160, 140, 0.7), rgba(170, 160, 140, 0));background: -webkit-linear-gradient(290deg, rgba(170, 160, 140, 0.75), rgba(170, 160, 140, 0));-webkit-filter: blur(1px);}"
+  "#switch {clip: rect(0 0 0 0);position: absolute;visibility: hidden;}"
+  "#switch:checked ~ .switch {background: linear-gradient(#f7f6f4, #fff);box-shadow:inset 0 -5px 0 #dbd3c8,0 6px 5px rgba(170, 160, 140, 0.75),3px 16px 5px rgba(170,160,140, 0.3);border-bottom: none;}"
+  "#switch:checked ~ .switch:after {display: none;}"
+  "a {color:#000000;}"
+  "#title {width:100%;text-align:center;font-size:40px;padding:10px;background:#336699;border-bottom: 2px solid #333333;}"
+  "#network {width:100%;text-align:center;border-bottom: 2px solid #333333;}"
+  ".network-item {font-size:30px;}"
+  "#lights {width:100%;text-align:center;background:#666666;padding:30px;border-bottom: 2px solid #333333;}"
+  "#light-status {border: 2px solid #333333;width:200px;margin:0 auto;background: #cccccc;border-radius: 20px;}"
+  ".light-item {font-size:30px;margin:0 10px 10px 10px;}"
+  "</style></head><body><div id='page'><div id='title'>Ligh Strip ESP8266</div>";
+String htmlTemplateBottom = "</div></body></html>";
+String htmlLight = "<div id='lights'><p id='light-label' class='light-item'>Spirit Hood</p><p id='light-status' class='light-item'><input type='checkbox' name='switch' id='switch' onclick='window.location = &apos;/lightSwitch&apos;'><label class='switch' for='switch'></label></p></div>";
+String htmlNetworkOne = "<div id='network'><p id='current-connection' class='network-item'>You are connected through the wifi network: <b></br>";
+String buttonsOne = "</br></br><a style='width: 20%; height 30px; border: 1px solid blue; padding: 2% 2%; margin: 3% 3%;' href='/rainbow'>Rainbow</a><a style='width: 20%; height 30px; border: 1px solid blue; padding: 2% 2%; margin: 3% 3%;' href='/rainbowWithGlitter'>Glitter</a><a style='width: 20%; height 30px; border: 1px solid blue; padding: 2% 2%; margin: 3% 3%;' href='/confetti'>Confetti</a><a style='width: 20%; height 30px; border: 1px solid blue; padding: 2% 2%; margin: 3% 3%;' href='/sinelon'>Sinelon</a> </br>";
+String buttonsTwo = "</br></br><a style='width: 20%; height 30px; border: 1px solid orange; padding: 2% 2%; margin: 3% 3%;' href='/juggle'>Juggle</a><a style='width: 20%; height 30px; border: 1px solid orange; padding: 2% 2%; margin: 3% 3%;' href='/bpm?beats=116'>BPM</a><a style='width: 20%; height 30px; border: 1px solid orange; padding: 2% 2%; margin: 3% 3%;' href='/solid?r=0&b=255=&g=100'>Solid</a><a style='width: 20%; height 30px; border: 1px solid orange; padding: 2% 2%; margin: 3% 3%;' href='/clock?h=12&m=59'>Clock</a><a style='width: 20%; height 30px; border: 1px solid orange; padding: 2% 2%; margin: 3% 3%;' href='/next'>Next</a>";
+String buttonsThree = "</br><br></br><a style='width: 10%; height 30px; border: 1px solid red; padding: 2% 0%; margin: 3% 1%;' href='/increase?c=1&a=10'>Up Red</a><a style='width: 10%; height 30px; border: 1px solid red; padding: 2% 0%; margin: 3% 1%;' href='/decrease?c=1&a=10'>Down Red</a><a style='width: 10%; height 30px; border: 1px solid blue; padding: 2% 0%; margin: 3% 1%;' href='/increase?c=2&a=10'>Up Blue</a><a style='width: 10%; height 30px; border: 1px solid blue; padding: 2% 0%; margin: 3% 1%;' href='/decrease?c=2&a=10'>Down Blue</a><a style='width: 10%; height 30px; border: 1px solid green; padding: 2% 0%; margin: 3% 1%;' href='/increase?c=3&a=10'>Up Green</a><a style='width: 10%; height 30px; border: 1px solid green; padding: 2% 0%; margin: 3% 1%;' href='/decrease?c=3&a=10'>Down Green</a>";
+String buttonsFour = "</br></br><br><a style='width: 10%; height 30px; border: 1px solid red; padding: 2% 0%; margin: 3% 1%;' href='/brightUp?a=50'>Brighten</a><a style='width: 10%; height 30px; border: 1px solid red; padding: 2% 0%; margin: 3% 1%;' href='/brightDown?a=50'>Dim</a><a style='padding: 2% 20%; height 30px; border: 1px solid black;' href='/solid?r=0&g=0=&b=0'>Off</a>";
+
+void handleRoot() {
+  //Start page content
+  server.sendHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+  server.sendHeader("Pragma", "no-cache");
+  server.sendHeader("Expires", "-1");
+  server.setContentLength(CONTENT_LENGTH_UNKNOWN);
+  server.send(200, "text/html", ""); // Empty content inhibits Content-length header so we have to close the socket ourselves.
+
+  //Put together HTML Template & Light Color
+  server.sendContent(htmlTemplateTop + htmlNetworkOne);
+  server.sendContent(String(softAP_ssid));
+  server.sendContent(buttonsOne);
+  server.sendContent(buttonsTwo);
+  server.sendContent(buttonsThree);
+  server.sendContent(buttonsFour);
+  server.sendContent(htmlTemplateBottom);
+  
+  server.client().stop(); // Stop is needed because we sent no content length
+}
+void handleNotFound() {
+  String message = "File Not Found\n\n";
+  message += "URI: ";
+  message += server.uri();
+  message += "\nMethod: ";
+  message += ( server.method() == HTTP_GET ) ? "GET" : "POST";
+  message += "\nArguments: ";
+  message += server.args();
+  message += "\n";
+  for ( uint8_t i = 0; i < server.args(); i++ ) {
+    message += " " + server.argName ( i ) + ": " + server.arg ( i ) + "\n";
+  }
+  server.sendHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+  server.sendHeader("Pragma", "no-cache");
+  server.sendHeader("Expires", "-1");
+  server.send ( 404, "text/plain", message );
+}
+
+// List of patterns to cycle through.  Each is defined as a separate function below.
+typedef void (*SimplePatternList[])();
+SimplePatternList gPatterns = { rainbow, rainbowWithGlitter, confetti, sinelon, bpm, juggle };
+
+uint8_t gCurrentPatternNumber = 0; // Index number of which pattern is current
+uint8_t gHue = 0; // rotating "base color" used by many of the patterns
+
+void ambient_loop(int a, int b, int c){
+    for(int k = 0; k < NUM_LEDS; k++) {
+      leds[k].setRGB(a, c, b);FastLED.show();
+    }
+}
+
+void solid_loop(){
+    for(int k = 0; k < NUM_LEDS; k++) {
+      leds[k].setRGB(r, b, g);FastLED.show();
+    }
+}
+
+
+
+void loop()
+{
+  //DNS
+  dnsServer.processNextRequest();
+  //HTTP
+  server.handleClient();
+  // Call the current pattern function once, updating the 'leds' array
+  if (homemade_method == false){
+     FastLED.setBrightness(BRIGHTNESS);
+     gPatterns[gCurrentPatternNumber]();
+      // send the 'leds' array out to the actual LED strip
+     FastLED.show();  
+     // insert a delay to keep the framerate modest
+     FastLED.delay(1000/FRAMES_PER_SECOND); 
+
+     // do some periodic updates
+     EVERY_N_MILLISECONDS( 20 ) { gHue++; } // slowly cycle the "base color" through the rainbow
+     delay(100);
+  }
+  if(homemade_method && clock_on){
+      clock_loop();
+      //delay inside loop already for second
+  }
+      // EVERY_N_SECONDS( 100 ) { nextPattern(); } // change patterns periodically
+}
+
+#define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
+
+void nextPattern()
+{
+  // add one to the current pattern number, and wrap around at the end
+  gCurrentPatternNumber = (gCurrentPatternNumber + 1) % ARRAY_SIZE( gPatterns);
+}
+
+void clock_loop()
+{
+  //  seconds start
+    sec_old = sec;
+    sec = sec - 1;
+    if(sec == 0){
+      sec = 66;
+    }
+    if(sec == 17){
+      sec = 15;
+    }
+    if(sec == 34){
+      sec = 32;
+    }
+    if(sec == 51){
+      sec = 49;
+    }
+    if(sec == zero_point){
+      mins = mins - 1;
+      ro_clock = r_clock;
+      go_clock = g_clock;
+      bo_clock = b_clock;
+      r_clock = random8(20);
+      g_clock = random8(20);
+      b_clock = random8(20);
+    }
+    
+  //seconds end
+
+  //  mins start
+     if(mins == 0){
+      mins = 66;
+     }
+     if(mins == 17){
+      mins = 15;
+     }
+     if(mins == 34){
+      mins = 32;
+     }
+     if(mins == 51){
+      mins = 49;
+     }
+    if (mins != mins_old){
+      set_min = true;
+      if(mins == zero_point){
+        hours = hours + 1;
+        if(hours == 13){
+         hours = 1;
+        }
+        for(int k = 0; k < NUM_LEDS; k++){
+          leds[k].setRGB(255, 255, 0);
+          FastLED.show();
+        }
+        for(int k = 0; k < NUM_LEDS; k++){
+            leds[k].setRGB(r_clock, g_clock, b_clock);
+        }
+        FastLED.show();
+      }
+    }
+  //mins end
+    leds[sec_old].setRGB(r_clock, g_clock, b_clock);
+    leds[8].setRGB(0, 255, 0);
+    leds[25].setRGB(0, 255, 0);
+    leds[42].setRGB(0, 255, 0);
+    leds[59].setRGB(0, 255, 0);
+    if(hours == 1){
+      for(int k = 18; k <= 22; k++){
+        if(sec == k){
+          sec_is_hour = true;
+        }
+        if(mins_old == k){
+          min_is_hour = true;
+        }
+        leds[k].setRGB(255, 0, 0);
+      }
+    }
+    if(hours == 2){
+      for(int k = 11; k <= 15; k++){
+        if(sec == k){
+          sec_is_hour = true;
+        }
+        if(mins_old == k){
+          min_is_hour = true;
+        }
+          leds[k].setRGB(255, 0, 0);
+      }
+    }
+    if(hours == 3){
+      for(int k = 6; k <= 10; k++){
+        if(sec == k){
+          sec_is_hour = true;
+        }
+        if(mins_old == k){
+          min_is_hour = true;
+        }
+          leds[k].setRGB(255, 0, 0);
+      }
+    }
+    if(hours == 4){
+      for(int k = 1; k <= 5; k++){
+        if(sec == k){
+          sec_is_hour = true;
+        }
+        if(mins_old == k){
+          min_is_hour = true;
+        }
+          leds[k].setRGB(255, 0, 0);
+      }
+    }
+    if(hours == 5){
+      for(int k = 62; k <= 66; k++){
+        if(sec == k){
+          sec_is_hour = true;
+        }
+        if(mins_old == k){
+          min_is_hour = true;
+        }
+          leds[k].setRGB(255, 0, 0);
+      }
+    }
+    if(hours == 6){
+      for(int k = 57; k <= 61; k++){
+        if(sec == k){
+          sec_is_hour = true;
+        }
+        if(mins_old == k){
+          min_is_hour = true;
+        }
+          leds[k].setRGB(255, 0, 0);
+      }
+    }
+    if(hours == 7){
+      for(int k = 52; k <= 56; k++){
+        if(sec == k){
+          sec_is_hour = true;
+        }
+        if(mins_old == k){
+          min_is_hour = true;
+        }
+          leds[k].setRGB(255, 0, 0);
+      }
+    }
+    if(hours == 8){
+      for(int k = 45; k <= 49; k++){
+        if(sec == k){
+          sec_is_hour = true;
+        }
+        if(mins_old == k){
+          min_is_hour = true;
+        }
+          leds[k].setRGB(255, 0, 0);
+      }
+    }
+    if(hours == 9){
+      for(int k = 40; k <= 44; k++){
+        if(sec == k){
+          sec_is_hour = true;
+        }
+        if(mins_old == k){
+          min_is_hour = true;
+        }
+          leds[k].setRGB(255, 0, 0);
+      }
+    }
+    if(hours == 10){
+      for(int k = 35; k <= 39; k++){
+        if(sec == k){
+          sec_is_hour = true;
+        }
+        if(mins_old == k){
+          min_is_hour = true;
+        }
+          leds[k].setRGB(255, 0, 0);
+      }
+    }
+    if(hours == 11){
+      for(int k = 28; k <= 32; k++){
+        if(sec == k){
+          sec_is_hour = true;
+        }
+        if(mins_old == k){
+          min_is_hour = true;
+        }
+          leds[k].setRGB(255, 0, 0);
+      }
+    }
+    if(hours == 12){
+      for(int k = 23; k <= 27; k++){
+        if(sec == k){
+          sec_is_hour = true;
+        }
+        if(mins_old == k){
+          min_is_hour = true;
+        }
+          leds[k].setRGB(255, 0, 0);
+      }
+    }
+
+    if(set_min){
+      if (min_is_hour){
+        Serial.println("min is hour");
+        Serial.println(mins_old);
+        leds[mins_old].setRGB(255, 0, 0);  //I need to reflect hour if I am in an hour or reflect red if I am not in an hour
+        min_is_hour = false;
+      }else{
+        Serial.println(mins_old);
+        leds[mins_old].setRGB(ro_clock, go_clock, bo_clock);  //I need to reflect hour if I am in an hour or reflect red if I am not in an hour
+      }
+      mins_old = mins;
+      set_min = false;
+    }
+    leds[mins].setRGB(0, 0, 255);
+    leds[sec].setRGB(75,0,130);
+
+    FastLED.show();
+    delay(1000);  // we have to make a delay to avoid overloading the serial port
+}
+
+void clock_call()
+{
+  int s_h = server.arg("h").toInt();
+  int s_m = server.arg("m").toInt();
+  Serial.println(s_h);
+  Serial.println(s_m);
+  mins = s_m;
+  hours = s_h;
+  clock_on = true;
+  homemade_method = true;
+  FastLED.addLeds<LED_TYPE,DATA_PIN,COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  for(int k = 0; k < NUM_LEDS; k++){
+      leds[k].setRGB(10,20,10);
+  }
+  FastLED.show();
+  handleRoot();
+}
+
+void rainbow_call() 
+{
+  homemade_method = false;
+  gCurrentPatternNumber = (1-1) % ARRAY_SIZE( gPatterns);
+  // FastLED's built-in rainbow generator
+  handleRoot();
+}
+
+void rainbowWithGlitter_call() 
+{
+  homemade_method = false;
+  gCurrentPatternNumber = (2-1) % ARRAY_SIZE( gPatterns);
+  // built-in FastLED rainbow, plus some random sparkly glitter
+  handleRoot();
+}
+
+void confetti_call() 
+{
+  homemade_method = false;
+   gCurrentPatternNumber = (3-1) % ARRAY_SIZE( gPatterns);
+  // random colored speckles that blink in and fade smoothly
+  handleRoot();;
+}
+
+void sinelon_call()
+{
+  homemade_method = false;
+  gCurrentPatternNumber = (4-1) % ARRAY_SIZE( gPatterns);
+  // a colored dot sweeping back and forth, with fading trails
+  handleRoot();
+}
+
+void bpm_call() 
+{
+  homemade_method = false;
+  gCurrentPatternNumber = (5-1) % ARRAY_SIZE( gPatterns);
+  // built-in FastLED rainbow, plus some random sparkly glitter
+  handleRoot();
+}
+
+void juggle_call()
+{
+  homemade_method = false;
+  gCurrentPatternNumber = (6-1) % ARRAY_SIZE( gPatterns);
+  // a colored dot sweeping back and forth, with fading trails
+  handleRoot();
+}
+
+
+void next_call() 
+{
+  homemade_method = false;
+  nextPattern();
+  handleRoot();
+}
+
+
+
+void rainbow() 
+{
+  // FastLED's built-in rainbow generator
+  fill_rainbow( leds, NUM_LEDS, gHue, 7);
+}
+
+void rainbowWithGlitter() 
+{
+  // built-in FastLED rainbow, plus some random sparkly glitter
+  rainbow();
+  addGlitter(80);
+}
+
+void addGlitter( fract8 chanceOfGlitter) 
+{
+  if( random8() < chanceOfGlitter) {
+    leds[ random16(NUM_LEDS) ] += CRGB::White;
+  }
+}
+
+void confetti() 
+{
+  // random colored speckles that blink in and fade smoothly
+  fadeToBlackBy( leds, NUM_LEDS, 10);
+  int pos = random16(NUM_LEDS);
+  leds[pos] += CHSV( gHue + random8(64), 200, 255);
+}
+
+void sinelon()
+{
+  // a colored dot sweeping back and forth, with fading trails
+  fadeToBlackBy( leds, NUM_LEDS, 20);
+  int pos = beatsin16( 13, 0, NUM_LEDS-1 );
+  leds[pos] += CHSV( gHue, 255, 192);
+}
+
+void bpm()
+{
+  // colored stripes pulsing at a defined Beats-Per-Minute (BPM)
+  CRGBPalette16 palette = PartyColors_p;
+  uint8_t beat = beatsin8( BeatsPerMinute, 64, 255);
+  for( int i = 0; i < NUM_LEDS; i++) { //9948
+    leds[i] = ColorFromPalette(palette, gHue+(i*2), beat-gHue+(i*10));
+  }
+}
+
+void juggle() {
+  // eight colored dots, weaving in and out of sync with each other
+  fadeToBlackBy( leds, NUM_LEDS, 20);
+  byte dothue = 0;
+  for( int i = 0; i < 8; i++) {
+    leds[beatsin16( i+7, 0, NUM_LEDS-1 )] |= CHSV(dothue, 200, 255);
+    dothue += 32;
+  }
+}
