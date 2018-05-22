@@ -1,0 +1,391 @@
+#define FASTLED_ESP8266_RAW_PIN_ORDER
+#define FASTLED_INTERNAL
+#define FASTLED_INTERRUPT_RETRY_COUNT 0
+#define FASTLED_ALLOW_INTERRUPTS 0
+
+#include "FastLED.h"
+#define FASTLED_ESP8266_RAW_PIN_ORDER
+#if defined(FASTLED_VERSION) && (FASTLED_VERSION < 3001000)
+#warning "Requires FastLED 3.1 or later; check github for latest code."
+#endif
+#define DATA_PIN    15
+//#define CLK_PIN   4
+#define LED_TYPE    WS2812B
+#define COLOR_ORDER GRB
+#define NUM_LEDS    60
+CRGB leds[NUM_LEDS];
+int BRIGHTNESS    =      255;
+#define FRAMES_PER_SECOND  120
+bool homemade_method = true;
+
+//start infinity clock
+int r_clock = 0;
+int g_clock = 20;
+int b_clock = 20;
+int ro_clock = 0;
+int go_clock = 20;
+int bo_clock = 20;
+int zero_point = 29;
+int hour_start = zero_point - 2;
+int hour_end = zero_point + 2;
+int min_set = 59;
+int sec_set = 43;
+int hour_set = 10;
+int sec = sec_set;
+int sec_old = sec_set;
+int mins = min_set;
+int mins_old = min_set;
+bool set_min = true;
+int hours = hour_set;
+int hours_old = hour_set + 1;
+bool sec_is_hour = false;
+bool min_is_hour = false;
+bool clock_on = false;
+bool tick_hour = false;
+int loops_around = 0;
+uint8_t gHue = 0;
+bool rainbow_clock = false;
+//end infinity clock
+
+void setup() {
+  clock_on = true;
+  homemade_method = true;
+  FastLED.addLeds<LED_TYPE,DATA_PIN,COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  for(int k = 0; k < NUM_LEDS; k++){
+      leds[k].setRGB(10,20,10);
+  }
+  FastLED.show();
+}
+
+void loop()
+{
+    
+  if(homemade_method && clock_on){
+      clock_loop();
+  }
+}
+
+void clock_loop()
+{
+  loops_around += 1;
+  if(rainbow_clock){
+    fill_rainbow( leds, NUM_LEDS, gHue, 7);
+    gHue++;
+    if(gHue == 255){
+      gHue = 0;
+    }
+    FastLED.setBrightness(250);
+  }
+  //  seconds start
+    sec_old = sec;
+    if(loops_around == 20){
+      sec = sec + 1;
+      loops_around = 0;
+    }
+    if(sec > 59){
+      sec = 0;
+    }
+    if(sec == zero_point && loops_around == 0){
+      mins = mins + 1;
+      ro_clock = r_clock;
+      go_clock = g_clock;
+      bo_clock = b_clock;
+      r_clock = random8(20);
+      g_clock = random8(20);
+      b_clock = random8(20);
+    }
+  //seconds end
+  //  mins start
+    if(mins >  59){
+      mins = 0;
+    }
+    if (mins != mins_old){
+      set_min = true;
+      if(mins == zero_point){
+        tick_hour = true;
+        hours = hours + 1;
+        if(hours == 13){
+         hours = 1;
+        }
+        for(int k = 0; k < NUM_LEDS; k++){
+          leds[k].setRGB(255, 255, 0);
+          FastLED.show();
+        }
+        for(int k = 0; k < NUM_LEDS; k++){
+            leds[k].setRGB(r_clock, g_clock, b_clock);
+        }
+        FastLED.show();
+      }
+    }
+  //mins end
+    if(!rainbow_clock){
+       if(sec != zero_point){
+        leds[sec_old].setRGB(r_clock, g_clock, b_clock);
+       }else{
+        leds[sec_old].setRGB(ro_clock, go_clock, bo_clock);
+       }
+    }
+    leds[59].setRGB(0, 255, 0);
+    leds[14].setRGB(0, 255, 0);
+    leds[29].setRGB(0, 255, 0);
+    leds[44].setRGB(0, 255, 0);
+    if(hours == 1){
+      hour_start = zero_point + 3;
+      hour_end = zero_point + 7;
+      if(hour_start > 59){
+        hour_start -= 60;
+      }
+      if(hour_end > 59){
+        hour_end -= 60;
+      }
+      for(int k = hour_start; k <= hour_end; k++){
+        if(sec == k){
+          sec_is_hour = true;
+        }
+        if(mins_old == k){
+          min_is_hour = true;
+        }
+        leds[k].setRGB(255, 0, 0);
+      }
+    }
+    if(hours == 2){
+      hour_start = zero_point + 8;
+      hour_end = zero_point + 12;
+      if(hour_start > 59){
+        hour_start -= 60;
+      }
+      if(hour_end > 59){
+        hour_end -= 60;
+      }
+      for(int k = hour_start; k <= hour_end; k++){
+        if(sec == k){
+          sec_is_hour = true;
+        }
+        if(mins_old == k){
+          min_is_hour = true;
+        }
+          leds[k].setRGB(255, 0, 0);
+      }
+    }
+    if(hours == 3){
+      hour_start = zero_point + 13;
+      hour_end = zero_point + 17;
+      if(hour_start > 59){
+        hour_start -= 60;
+      }
+      if(hour_end > 59){
+        hour_end -= 60;
+      }
+      for(int k = hour_start; k <= hour_end; k++){
+        if(sec == k){
+          sec_is_hour = true;
+        }
+        if(mins_old == k){
+          min_is_hour = true;
+        }
+          leds[k].setRGB(255, 0, 0);
+      }
+    }
+    if(hours == 4){
+      hour_start = zero_point + 18;
+      hour_end = zero_point + 22;
+      if(hour_start > 59){
+        hour_start -= 60;
+      }
+      if(hour_end > 59){
+        hour_end -= 60;
+      }
+      for(int k = hour_start; k <= hour_end; k++){
+        if(sec == k){
+          sec_is_hour = true;
+        }
+        if(mins_old == k){
+          min_is_hour = true;
+        }
+          leds[k].setRGB(255, 0, 0);
+      }
+    }
+    if(hours == 5){
+      hour_start = zero_point + 23;
+      hour_end = zero_point + 27;
+      if(hour_start > 59){
+        hour_start -= 60;
+      }
+      if(hour_end > 59){
+        hour_end -= 60;
+      }
+      for(int k = hour_start; k <= hour_end; k++){
+        if(sec == k){
+          sec_is_hour = true;
+        }
+        if(mins_old == k){
+          min_is_hour = true;
+        }
+          leds[k].setRGB(255, 0, 0);
+      }
+    }
+    if(hours == 6){
+      hour_start = zero_point + 28;
+      hour_end = zero_point + 32;
+      if(hour_start > 59){
+        hour_start -= 60;
+      }
+      if(hour_end > 59){
+        hour_end -= 60;
+      }
+      for(int k = hour_start; k <= hour_end; k++){
+        if(sec == k){
+          sec_is_hour = true;
+        }
+        if(mins_old == k){
+          min_is_hour = true;
+        }
+          leds[k].setRGB(255, 0, 0);
+      }
+    }
+    if(hours == 7){
+      hour_start = zero_point + 33;
+      hour_end = zero_point + 37;
+      if(hour_start > 59){
+        hour_start -= 60;
+      }
+      if(hour_end > 59){
+        hour_end -= 60;
+      }
+      for(int k = hour_start; k <= hour_end; k++){
+        if(sec == k){
+          sec_is_hour = true;
+        }
+        if(mins_old == k){
+          min_is_hour = true;
+        }
+          leds[k].setRGB(255, 0, 0);
+      }
+    }
+    if(hours == 8){
+      hour_start = zero_point + 38;
+      hour_end = zero_point + 42;
+      if(hour_start > 59){
+        hour_start -= 60;
+      }
+      if(hour_end > 59){
+        hour_end -= 60;
+      }
+      for(int k = hour_start; k <= hour_end; k++){
+        if(sec == k){
+          sec_is_hour = true;
+        }
+        if(mins_old == k){
+          min_is_hour = true;
+        }
+          leds[k].setRGB(255, 0, 0);
+      }
+    }
+    if(hours == 9){
+      hour_start = zero_point + 43;
+      hour_end = zero_point + 47;
+      if(hour_start > 59){
+        hour_start -= 60;
+      }
+      if(hour_end > 59){
+        hour_end -= 60;
+      }
+      for(int k = hour_start; k <= hour_end; k++){
+        if(sec == k){
+          sec_is_hour = true;
+        }
+        if(mins_old == k){
+          min_is_hour = true;
+        }
+          leds[k].setRGB(255, 0, 0);
+      }
+    }
+    if(hours == 10){
+      hour_start = zero_point + 48;
+      hour_end = zero_point + 52;
+      if(hour_start > 59){
+        hour_start -= 60;
+      }
+      if(hour_end > 59){
+        hour_end -= 60;
+      }
+      for(int k = hour_start; k <= hour_end; k++){
+        if(sec == k){
+          sec_is_hour = true;
+        }
+        if(mins_old == k){
+          min_is_hour = true;
+        }
+          leds[k].setRGB(255, 0, 0);
+      }
+    }
+    if(hours == 11){
+      hour_start = zero_point + 53;
+      hour_end = zero_point + 57;
+      if(hour_start > 59){
+        hour_start -= 60;
+      }
+      if(hour_end > 59){
+        hour_end -= 60;
+      }
+      for(int k = hour_start; k <= hour_end; k++){
+        if(sec == k){
+          sec_is_hour = true;
+        }
+        if(mins_old == k){
+          min_is_hour = true;
+        }
+          leds[k].setRGB(255, 0, 0);
+      }
+    }
+    if(hours == 12){
+      hour_start = zero_point + 58;
+      hour_end = zero_point + 62;
+      if(hour_start > 59){
+        hour_start -= 60;
+      }
+      if(hour_end > 59){
+        hour_end -= 60;
+      }
+      for(int k = hour_start; k <= hour_end; k++){
+        if(sec == k){
+          sec_is_hour = true;
+        }
+        if(mins_old == k){
+          min_is_hour = true;
+        }
+          leds[k].setRGB(255, 0, 0);
+      }
+    }
+
+    if(set_min){
+      if (min_is_hour && tick_hour == false){
+        leds[mins_old].setRGB(255, 0, 0);  //I need to reflect hour if I am in an hour or reflect red if I am not in an hour
+        min_is_hour = false;
+      }else{
+        if(tick_hour){
+          tick_hour = false;
+          leds[mins_old].setRGB(r_clock, g_clock, b_clock);  //I need to reflect hour if I am in an hour or reflect red if I am not in an hour
+        }else{
+          leds[mins_old].setRGB(ro_clock, go_clock, bo_clock);  //I need to reflect hour if I am in an hour or reflect red if I am not in an hour
+        }
+      }
+      mins_old = mins;
+      set_min = false;
+    }
+    leds[mins].setRGB(0, 0, 255);
+    leds[sec].setRGB(75,0,130);
+    FastLED.show();
+    delay(50);  // we have to make a delay to avoid overloading the serial port
+}
+
+void clock_call()
+{
+  clock_on = true;
+  homemade_method = true;
+  FastLED.addLeds<LED_TYPE,DATA_PIN,COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  for(int k = 0; k < NUM_LEDS; k++){
+      leds[k].setRGB(10,20,10);
+  }
+  FastLED.show();
+}
