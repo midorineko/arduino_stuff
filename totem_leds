@@ -41,7 +41,7 @@ int status = WL_IDLE_STATUS;
 #define COLOR_ORDER GRB
 #define NUM_LEDS    50
 CRGB leds[NUM_LEDS];
-#define BRIGHTNESS          130
+int BRIGHTNESS    =      130;
 int FRAMES_PER_SECOND = 60;
 uint8_t BeatsPerMinute = 62;
 int r = 0;
